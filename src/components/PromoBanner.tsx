@@ -1,6 +1,7 @@
 import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import { getImageUrl } from "@/lib/api";
 
 interface PromoBannerProps {
     imageUrls?: string[];
@@ -9,9 +10,7 @@ interface PromoBannerProps {
 const PromoBanner: React.FC<PromoBannerProps> = ({ imageUrls }) => {
     const validUrls = React.useMemo(() => {
         if (!imageUrls) return [];
-        return imageUrls.map(url =>
-            url.startsWith('http') || url.startsWith('/') ? url : `/uploads/${url}`
-        );
+        return imageUrls.map(url => getImageUrl(url));
     }, [imageUrls]);
 
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [

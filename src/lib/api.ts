@@ -1,5 +1,12 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+export function getImageUrl(imagePath?: string): string {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('data:') || imagePath.startsWith('http')) return imagePath;
+  if (imagePath.startsWith('/')) return `${BASE_URL}${imagePath}`;
+  return `${BASE_URL}/${imagePath}`;
+}
+
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const isFormData = options.body instanceof FormData;
 

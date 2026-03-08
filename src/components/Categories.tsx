@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getImageUrl } from "@/lib/api";
 import { Brain, Flame, HandHeart, Heart, Leaf, Shield, Sparkles, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -70,11 +70,11 @@ export const categories: Array<{ id: string | number; name: string; icon: any; c
 ];
 
 const normalizeImage = (image?: string, updatedAt?: string) => {
-  if (!image) return '';
-  if (image.startsWith('data:')) return image;
-  if (!updatedAt) return image;
-  const separator = image.includes('?') ? '&' : '?';
-  return `${image}${separator}v=${encodeURIComponent(updatedAt)}`;
+  const url = getImageUrl(image);
+  if (!url) return '';
+  if (url.startsWith('data:') || !updatedAt) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${encodeURIComponent(updatedAt)}`;
 };
 
 const Categories = ({ heroCollectionIds }: { heroCollectionIds?: string[] }) => {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Volume2, VolumeX } from "lucide-react";
+import { getImageUrl } from "@/lib/api";
 
 interface VideoPromoBannerProps {
     title?: string;
@@ -18,7 +19,7 @@ const VideoPromoBanner: React.FC<VideoPromoBannerProps> = ({ title, videoUrls })
     }, [videoUrls]);
 
     const currentUrl = videoUrls && videoUrls.length > 0 ? videoUrls[currentIndex] : null;
-    const formattedUrl = currentUrl ? (currentUrl.startsWith('http') || currentUrl.startsWith('/') ? currentUrl : `/uploads/${currentUrl}`) : "";
+    const formattedUrl = currentUrl ? getImageUrl(currentUrl) : "";
 
     // Handle browser autoplay policies (browsers block unmuted autoplay)
     useEffect(() => {

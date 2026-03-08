@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { apiFetch, BASE_URL } from "@/lib/api";
+import { apiFetch, getImageUrl } from "@/lib/api";
 import { ShoppingCart, Star, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -43,10 +43,7 @@ type ApiProduct = {
 };
 
 const normalizeImage = (image?: string) => {
-  if (!image) return "";
-  if (image.startsWith("data:") || image.startsWith("http")) return image;
-  if (image.startsWith("/uploads")) return `${BASE_URL}${image}`;
-  return image;
+  return getImageUrl(image);
 };
 
 const ProductShowcase = ({

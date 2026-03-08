@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useCart } from "@/hooks/use-cart";
-import { apiFetch, BASE_URL } from "@/lib/api";
+import { apiFetch, getImageUrl } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router-dom";
 
@@ -15,10 +15,7 @@ interface Product {
 }
 
 const normalizeImage = (image?: string) => {
-  if (!image) return "";
-  if (image.startsWith("data:") || image.startsWith("http")) return image;
-  if (image.startsWith("/uploads")) return `${BASE_URL}${image}`;
-  return image;
+  return getImageUrl(image);
 };
 
 const CollectionPage = () => {

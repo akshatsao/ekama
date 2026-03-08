@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
-import { BASE_URL } from "@/lib/api";
+import { getImageUrl } from "@/lib/api";
 import {
   Carousel,
   CarouselContent,
@@ -65,9 +65,7 @@ const Testimonials = ({
         >
           <CarouselContent className="-ml-4 gap-y-4">
             {displayTestimonials.map((testimonial, index) => {
-              const bgImage = testimonial.image && !testimonial.image.startsWith('http') && !testimonial.image.startsWith('/')
-                ? `${BASE_URL}/uploads/${testimonial.image}`
-                : testimonial.image;
+              const bgImage = testimonial.image ? getImageUrl(testimonial.image) : "";
 
               return (
                 <CarouselItem key={testimonial.id || index} className="pl-4 md:basis-1/2 lg:basis-1/3">
