@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 25 65% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 25 65% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 65% 20%;
+
+    --primary: 25 95% 53%;
+    --primary-foreground: 40 100% 99%;
+
+    --secondary: 45 100% 51%;
+    --secondary-foreground: 25 65% 20%;
+
+    --muted: 38 35% 92%;
+    --muted-foreground: 25 25% 45%;
+
+    --accent: 0 72% 51%;
+    --accent-foreground: 40 100% 99%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 38 30% 88%;
+    --input: 38 30% 88%;
+    --ring: 25 95% 53%;
+
+    --radius: 0.5rem;
+    
+    --spiritual-saffron: 25 95% 53%;
+    --spiritual-gold: 45 100% 51%;
+    --spiritual-red: 0 72% 51%;
+    --spiritual-cream: 38 45% 97%;
+    --spiritual-deep: 25 80% 30%;
+    
+    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53% / 0.95), hsl(45 100% 51% / 0.9));
+    --gradient-card: linear-gradient(180deg, hsl(40 100% 99%), hsl(38 45% 97%));
+    --gradient-divine: linear-gradient(135deg, hsl(25 95% 53%), hsl(45 100% 51%), hsl(0 72% 51%));
+    --gradient-sacred: linear-gradient(180deg, hsl(25 95% 53%), hsl(25 80% 45%));
+    
+    --shadow-soft: 0 4px 20px hsl(25 95% 53% / 0.15);
+    --shadow-hover: 0 8px 30px hsl(25 95% 53% / 0.25);
+    --shadow-divine: 0 10px 40px hsl(45 100% 51% / 0.35);
+    --shadow-sacred: 0 15px 50px hsl(25 95% 53% / 0.4);
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .admin-theme {
+    --background: 0 0% 0% / 0;
+    --card: 0 0% 0% / 0;
+    --popover: 0 0% 0% / 0;
+  }
+
+  .dark {
+    --background: 25 50% 8%;
+    --foreground: 40 45% 95%;
+
+    --card: 25 45% 12%;
+    --card-foreground: 40 45% 95%;
+
+    --popover: 25 45% 12%;
+    --popover-foreground: 40 45% 95%;
+
+    --primary: 25 95% 58%;
+    --primary-foreground: 25 50% 8%;
+
+    --secondary: 45 100% 58%;
+    --secondary-foreground: 25 50% 8%;
+
+    --muted: 25 30% 18%;
+    --muted-foreground: 38 25% 65%;
+
+    --accent: 0 72% 58%;
+    --accent-foreground: 25 50% 8%;
+
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 25 35% 22%;
+    --input: 25 35% 22%;
+    --ring: 25 95% 58%;
+    
+    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53% / 0.95), hsl(45 100% 51% / 0.9));
+    --gradient-card: linear-gradient(180deg, hsl(25 45% 12%), hsl(25 45% 15%));
+    --gradient-divine: linear-gradient(135deg, hsl(25 95% 53%), hsl(45 100% 51%), hsl(0 72% 51%));
+    --gradient-sacred: linear-gradient(180deg, hsl(25 95% 53%), hsl(25 80% 45%));
+    
+    --shadow-soft: 0 4px 20px hsl(0 0% 0% / 0.5);
+    --shadow-hover: 0 8px 30px hsl(25 95% 53% / 0.4);
+    --shadow-divine: 0 10px 40px hsl(45 100% 51% / 0.5);
+    --shadow-sacred: 0 15px 50px hsl(25 95% 53% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+@supports (color:color-mix(in lab,red,red)) {
+  .admin-theme * {
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+  }
+}
+
+@layer utilities {
+  .animate-flash-hindi {
+    animation: flash-hindi 3s ease-in-out infinite;
+  }
+  
+  .animate-flash-english {
+    animation: flash-english 3s ease-in-out infinite;
+  }
+  
+  @keyframes flash-hindi {
+    0%, 45% {
+      opacity: 1;
+    }
+    50%, 95% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes flash-english {
+    0%, 45% {
+      opacity: 0;
+    }
+    50%, 95% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  
+  /* Remove white backgrounds from all sections */
+  .admin-theme section,
+  .admin-theme main,
+  .admin-theme div {
+    background-color: transparent !important;
+  }
+
+  /* Animated moving border around cards */
+  @keyframes animated-border {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 200% 0%;
+    }
+  }
+
+  .animated-border {
+    position: relative;
+  }
+  .animated-border::before {
+     content: "";
+     position: absolute;
+     inset: 0;
+     padding: 2px; /* Border thickness */
+     background: linear-gradient(90deg, #fb923c, #f59e0b, #fb923c, #f97316, #fb923c);
+     background-size: 400% 400%;
+     border-radius: 1.5rem; /* Match card radius */
+     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+     -webkit-mask-composite: xor;
+             mask-composite: exclude;
+     pointer-events: none;
+     animation: animated-border 6s linear infinite;
+   }
+
+   /* Optional: stop on hover (remove if continuous always) */
+   .animated-border:hover::before {
+     animation-play-state: paused;
+   }
+
+}

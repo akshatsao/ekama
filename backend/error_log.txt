@@ -1,0 +1,26 @@
+[2026-03-02T13:24:11.271Z] POST /api/products
+MulterError: File too large
+    at abortWithCode (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\multer\lib\make-middleware.js:73:22)
+    at FileStream.<anonymous> (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\multer\lib\make-middleware.js:136:11)
+    at FileStream.emit (node:events:518:28)
+    at FileStream.emit (node:domain:489:12)
+    at SBMH.ssCb [as _cb] (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\busboy\lib\types\multipart.js:479:32)
+    at feed (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\streamsearch\lib\sbmh.js:248:10)
+    at SBMH.push (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\streamsearch\lib\sbmh.js:104:16)
+    at Multipart._write (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\busboy\lib\types\multipart.js:567:19)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+
+[2026-03-02T13:24:21.181Z] POST /api/products
+MulterError: File too large
+    at abortWithCode (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\multer\lib\make-middleware.js:73:22)
+    at FileStream.<anonymous> (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\multer\lib\make-middleware.js:136:11)
+    at FileStream.emit (node:events:518:28)
+    at FileStream.emit (node:domain:489:12)
+    at SBMH.ssCb [as _cb] (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\busboy\lib\types\multipart.js:479:32)
+    at feed (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\streamsearch\lib\sbmh.js:248:10)
+    at SBMH.push (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\streamsearch\lib\sbmh.js:104:16)
+    at Multipart._write (C:\Users\br04a\Downloads\ekama-lov\ekama\backend\node_modules\busboy\lib\types\multipart.js:567:19)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+
