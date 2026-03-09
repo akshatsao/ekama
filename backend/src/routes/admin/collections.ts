@@ -1,11 +1,43 @@
 import type { Request } from 'express';
 import express from 'express';
+import path from 'path';
+import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { authenticate, authorizeAdmin } from '../../middleware/auth';
 import { ApiResponse, AuthTokenPayload, Collection } from '../../types';
 import { getCollectionsCollection, getProductsCollection } from '../../utils/database';
+import { getUploadsDir } from '../../utils/paths';
 
 const router = express.Router();
+
+const uploadsRoot = getUploadsDir();
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      cb(null, uploadsRoot);
+    },
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, `${uuidv4()}${ext}`);
+    }
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
+router.post('/upload', authenticate, authorizeAdmin, upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'No image file provided' });
+      return;
+    }
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.status(200).json({ url: imageUrl });
+    return;
+  } catch (error) {
+    console.error('Failed to upload collection image:', error);
+    res.status(500).json({ error: 'Failed to process image upload' });
+  }
+});
 
 type AuthenticatedRequest = Request & { user: AuthTokenPayload };
 

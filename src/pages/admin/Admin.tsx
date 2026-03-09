@@ -664,18 +664,28 @@ const Admin = () => {
     }
     const urlKey = categoryForm.urlKey.trim() || toUrlKey(name);
     const description = categoryForm.description.trim();
-    const existing = categoryRouteId && categoryRouteId !== 'new'
-      ? collections.find((item) => item.id === categoryRouteId)
-      : null;
+
     let image = categoryForm.existingImage || '';
     if (categoryForm.imageFile) {
       try {
-        image = await readImageFile(categoryForm.imageFile);
+        const formData = new FormData();
+        formData.append('image', categoryForm.imageFile);
+
+        const uploadRes = await apiFetch('/api/collections/upload', {
+          method: 'POST',
+          body: formData,
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (uploadRes && uploadRes.url) {
+          image = uploadRes.url;
+        }
       } catch (error) {
-        toast({ title: 'Image error', description: String(error) });
+        toast({ title: 'Image upload error', description: String(error), variant: 'destructive' });
         return;
       }
     }
+
     const payload = {
       name,
       description,
