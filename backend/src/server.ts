@@ -118,6 +118,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug endpoint to check path existence
+app.get('/api/debug-paths', (req, res) => {
+  const dirs = {
+    cwd: process.cwd(),
+    __dirname: __dirname,
+    node_env: process.env.NODE_ENV,
+    checks: uploadPaths.map(p => ({
+      path: p,
+      exists: fs.existsSync(p),
+      contents: fs.existsSync(p) ? fs.readdirSync(p).slice(0, 10) : []
+    }))
+  };
+  res.json(dirs);
+});
+
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   const error = err instanceof Error ? err : new Error('Unknown error');
