@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { authenticate, authorizeAdmin } from '../../middleware/auth';
 import { ApiResponse, AuthTokenPayload, Product } from '../../types';
 import { getCollectionsCollection, getProductsCollection } from '../../utils/database';
+import { getUploadsDir } from '../../utils/paths';
 
 const router = express.Router();
 

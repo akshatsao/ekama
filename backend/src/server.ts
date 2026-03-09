@@ -21,6 +21,7 @@ import userRoutes from './routes/users';
 import adminCouponsRoute from './routes/admin/coupons';
 import customerCouponsRoute from './routes/customer/coupons';
 import { initDatabase } from './utils/database';
+import { getUploadsDir } from './utils/paths';
 
 const rootEnvPath = path.resolve(__dirname, '../../.env');
 dotenv.config({ path: rootEnvPath });
@@ -83,19 +84,27 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static file serving for uploaded images with cross-origin headers
+const unifiedUploadPath = getUploadsDir();
 const uploadPaths = [
+  unifiedUploadPath,
   path.join(__dirname, '../public/uploads'),
   path.join(process.cwd(), 'public/uploads'),
   path.join(process.cwd(), 'backend/public/uploads')
 ];
 
-uploadPaths.forEach(uploadPath => {
-  app.use('/uploads', express.static(uploadPath, {
-    setHeaders: (res) => {
-      res.set('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://ekama-one.vercel.app');
-      res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    }
-  }));
+// Use a Set to ensure we only mount each unique path once
+const uniquePaths = Array.from(new Set(uploadPaths));
+
+uniquePaths.forEach(uploadPath => {
+  if (fs.existsSync(uploadPath)) {
+    console.log(`[Static] Serving uploads from: ${uploadPath}`);
+    app.use('/uploads', express.static(uploadPath, {
+      setHeaders: (res) => {
+        res.set('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://ekama-one.vercel.app');
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+      }
+    }));
+  }
 });
 
 // API routes

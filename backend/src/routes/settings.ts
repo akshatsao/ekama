@@ -5,13 +5,11 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { getStoreSettingsCollection } from '../utils/database';
 import { authenticate, authorizeAdmin } from '../middleware/auth';
+import { getUploadsDir } from '../utils/paths';
 
 const router = express.Router();
 
-const uploadsRoot = path.resolve(__dirname, '../../../public/uploads');
-if (!fs.existsSync(uploadsRoot)) {
-    fs.mkdirSync(uploadsRoot, { recursive: true });
-}
+const uploadsRoot = getUploadsDir();
 
 const upload = multer({
     storage: multer.diskStorage({
