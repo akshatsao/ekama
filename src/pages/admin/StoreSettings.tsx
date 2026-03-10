@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getImageUrl } from "@/lib/api";
 
 export type StoreSettingsDoc = {
     heroTitle: string;
@@ -388,7 +388,7 @@ const StoreSettings = () => {
                                                     {settings.promoBannerImages.map((img, i) => (
                                                         <div key={i} className="w-48 h-28 rounded-lg overflow-hidden border border-gray-200 shadow-sm relative group bg-white">
                                                             <img
-                                                                src={img.startsWith('http') || img.startsWith('/') ? img : `/uploads/${img}`}
+                                                                src={getImageUrl(img)}
                                                                 alt={`Promo Banner ${i + 1}`}
                                                                 className="w-full h-full object-cover"
                                                             />
@@ -516,7 +516,7 @@ const StoreSettings = () => {
                                                 <div className="flex flex-col gap-2">
                                                     {selectedCollections.map((col: any) => (
                                                         <div key={col.id} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200">
-                                                            <img src={col.image.startsWith('http') || col.image.startsWith('/') || col.image.startsWith('data:') ? col.image : `/uploads/${col.image}`} alt={col.name} className="w-10 h-10 object-cover rounded-md border" />
+                                                            <img src={getImageUrl(col.image)} alt={col.name} className="w-10 h-10 object-cover rounded-md border" />
                                                             <span className="text-sm flex-1 font-medium text-gray-700">{col.name}</span>
                                                             <button
                                                                 onClick={() => handleCollectionToggle(col.id)}
@@ -565,7 +565,7 @@ const StoreSettings = () => {
                                                 <div className="flex flex-col gap-2">
                                                     {selectedProducts.map((product: any) => (
                                                         <div key={product.id} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200">
-                                                            <img src={product.image.startsWith('http') || product.image.startsWith('/') ? product.image : `/uploads/${product.image}`} alt={product.name} className="w-10 h-10 object-cover rounded-md border" />
+                                                            <img src={getImageUrl(product.image)} alt={product.name} className="w-10 h-10 object-cover rounded-md border" />
                                                             <span className="text-sm flex-1 font-medium text-gray-700">{product.name}</span>
                                                             <button
                                                                 onClick={() => handleProductToggle(sec.key as any, product.id)}
@@ -601,7 +601,7 @@ const StoreSettings = () => {
                                                     <div className="flex flex-col items-center gap-2">
                                                         <div className="w-32 h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden bg-gray-50 relative group">
                                                             {t.image ? (
-                                                                <img src={t.image.startsWith('http') || t.image.startsWith('/') ? t.image : `/uploads/${t.image}`} alt={t.name} className="w-full h-full object-cover" />
+                                                                <img src={getImageUrl(t.image)} alt={t.name} className="w-full h-full object-cover" />
                                                             ) : (
                                                                 <div className="text-gray-400 flex flex-col items-center text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg>No Image</div>
                                                             )}

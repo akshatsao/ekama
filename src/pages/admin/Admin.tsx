@@ -4,7 +4,7 @@ import { products as frontendProducts } from '@/components/ProductShowcase';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { apiFetch, BASE_URL } from '@/lib/api';
+import { apiFetch, BASE_URL, getImageUrl } from '@/lib/api';
 import { ChevronDown, LayoutDashboard, Package, Search, Settings, ShoppingBag, Tags, Ticket, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -1553,7 +1553,7 @@ const Admin = () => {
                     {categoryForm.existingImage && !categoryForm.imageFile && (
                       <div className="w-32 h-32 rounded bg-slate-100 overflow-hidden relative group">
                         <img
-                          src={categoryForm.existingImage}
+                          src={getImageUrl(categoryForm.existingImage)}
                           alt="Current collection"
                           className="w-full h-full object-cover"
                         />
