@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getStoreSettingsCollection } from '../utils/database';
 import { authenticate, authorizeAdmin } from '../middleware/auth';
 import { getUploadsDir } from '../utils/paths';
+import { optimizeImage } from '../utils/image';
 
 const router = express.Router();
 
@@ -57,13 +58,13 @@ router.get('/:id', async (req, res) => {
 });
 
 // Admin ONLY route to handle file uploads for settings
-router.post('/upload', authenticate, authorizeAdmin, upload.array('images', 5), (req, res) => {
+router.post('/upload', authenticate, authorizeAdmin, upload.array('images', 5), async (req, res) => {
     try {
-        if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-            res.status(400).json({ error: 'No image files provided' });
-            return;
-        }
-        const imageUrls = req.files.map((file: Express.Multer.File) => `/uploads/${file.filename}`);
+        const uploadedFiles = req.files as Express.Multer.File[];
+        const optimizedFilenames = await Promise.all(
+            uploadedFiles.map(file => optimizeImage(file.path, uploadsRoot))
+        );
+        const imageUrls = optimizedFilenames.map((filename) => `/uploads/${filename}`);
         res.status(200).json({ urls: imageUrls });
         return;
     } catch (error) {

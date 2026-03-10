@@ -8,6 +8,7 @@ import { authenticate, authorizeAdmin } from '../../middleware/auth';
 import { ApiResponse, AuthTokenPayload, Product } from '../../types';
 import { getCollectionsCollection, getProductsCollection } from '../../utils/database';
 import { getUploadsDir } from '../../utils/paths';
+import { optimizeImage } from '../../utils/image';
 
 const router = express.Router();
 
@@ -35,10 +36,7 @@ type ProductDoc = {
   updatedBy?: string;
 };
 
-const uploadsRoot = path.resolve(__dirname, '../../../public/uploads');
-if (!fs.existsSync(uploadsRoot)) {
-  fs.mkdirSync(uploadsRoot, { recursive: true });
-}
+const uploadsRoot = getUploadsDir();
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -129,7 +127,12 @@ router.post('/', authenticate, authorizeAdmin, upload.array('images', 5), async 
       specifications = {}
     } = req.body || {};
     const uploadedFiles = (req.files || []) as Express.Multer.File[];
-    const uploadedImages = uploadedFiles.map((file) => `/uploads/${file.filename}`);
+
+    // Optimize images
+    const optimizedFilenames = await Promise.all(
+      uploadedFiles.map(file => optimizeImage(file.path, uploadsRoot))
+    );
+    const uploadedImages = optimizedFilenames.map((filename) => `/uploads/${filename}`);
 
     if (!name || typeof price === 'undefined' || !collection) {
       return res.status(400).json({
@@ -215,7 +218,11 @@ router.patch('/:id', authenticate, authorizeAdmin, upload.array('images', 5), as
     specifications
   } = req.body || {};
   const uploadedFiles = (req.files || []) as Express.Multer.File[];
-  const uploadedImages = uploadedFiles.map((file) => `/uploads/${file.filename}`);
+
+  const optimizedFilenames = await Promise.all(
+    uploadedFiles.map(file => optimizeImage(file.path, uploadsRoot))
+  );
+  const uploadedImages = optimizedFilenames.map((filename) => `/uploads/${filename}`);
 
   const updates: Partial<ProductDoc> = {};
   const unset: Record<string, ''> = {};

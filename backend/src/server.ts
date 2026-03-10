@@ -99,9 +99,15 @@ uniquePaths.forEach(uploadPath => {
   if (fs.existsSync(uploadPath)) {
     console.log(`[Static] Serving uploads from: ${uploadPath}`);
     app.use('/uploads', express.static(uploadPath, {
-      setHeaders: (res) => {
-        res.set('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://ekama-one.vercel.app');
+      maxAge: '1y',
+      immutable: true,
+      setHeaders: (res, path) => {
+        res.set('Access-Control-Allow-Origin', '*'); // Allow all for public assets
         res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+
+        // Ensure correct content-type for modern formats to avoid ORB blocks
+        if (path.endsWith('.webp')) res.set('Content-Type', 'image/webp');
+        if (path.endsWith('.avif')) res.set('Content-Type', 'image/avif');
       }
     }));
   }

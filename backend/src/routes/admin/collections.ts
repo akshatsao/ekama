@@ -7,6 +7,7 @@ import { authenticate, authorizeAdmin } from '../../middleware/auth';
 import { ApiResponse, AuthTokenPayload, Collection } from '../../types';
 import { getCollectionsCollection, getProductsCollection } from '../../utils/database';
 import { getUploadsDir } from '../../utils/paths';
+import { optimizeImage } from '../../utils/image';
 
 const router = express.Router();
 
@@ -24,13 +25,14 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-router.post('/upload', authenticate, authorizeAdmin, upload.single('image'), (req, res) => {
+router.post('/upload', authenticate, authorizeAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No image file provided' });
       return;
     }
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const optimizedFilename = await optimizeImage(req.file.path, uploadsRoot);
+    const imageUrl = `/uploads/${optimizedFilename}`;
     res.status(200).json({ url: imageUrl });
     return;
   } catch (error) {
