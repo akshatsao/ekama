@@ -51,6 +51,18 @@ type AdminOrder = {
   updatedAt: string;
 };
 
+type CustomerRow = {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  role?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 type SetupValues = {
   email: string;
   password: string;
@@ -173,6 +185,8 @@ const Admin = () => {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
+  const [customers, setCustomers] = useState<CustomerRow[]>([]);
+  const [customersLoading, setCustomersLoading] = useState(false);
 
   const [categoryForm, setCategoryForm] = useState({
     name: '',
@@ -323,6 +337,33 @@ const Admin = () => {
     };
     fetchProducts();
   }, [isAdmin, selectedCollection, toast, collections]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    if (activeSection !== 'customers') return;
+    let isMounted = true;
+    const fetchCustomers = async () => {
+      setCustomersLoading(true);
+      try {
+        const res = await apiFetch('/api/users/customers');
+        const rows = Array.isArray(res?.data) ? res.data : [];
+        if (isMounted) {
+          setCustomers(rows as CustomerRow[]);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setCustomers([]);
+        }
+        toast({ title: 'Failed to load customers', description: String(error) });
+      } finally {
+        if (isMounted) setCustomersLoading(false);
+      }
+    };
+    fetchCustomers();
+    return () => {
+      isMounted = false;
+    };
+  }, [isAdmin, activeSection, toast]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -1131,6 +1172,64 @@ const Admin = () => {
                                 View Details
                               </button>
                             </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'customers' && (
+            <div
+              className={`${glassPanel} rounded-2xl p-5`}
+              style={{ backgroundImage: `url(${adminBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-800">
+                  <Users className="h-4 w-4 text-slate-500" />
+                  <span>Customers</span>
+                </div>
+              </div>
+
+              <div className={glassTable}>
+                <table className="w-full text-sm">
+                  <thead className="text-left text-slate-400 bg-white/50">
+                    <tr>
+                      <th className="py-3 px-4">Name</th>
+                      <th className="py-3 px-4">Email</th>
+                      <th className="py-3 px-4">Phone</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-slate-700">
+                    {customersLoading ? (
+                      <tr>
+                        <td colSpan={5} className="py-6 text-center text-slate-400">Loading customers...</td>
+                      </tr>
+                    ) : customers.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-6 text-center text-slate-400">No customers found</td>
+                      </tr>
+                    ) : (
+                      customers.map((customer) => {
+                        const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Guest';
+                        const joined = customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : '-';
+                        const statusLabel = customer.isActive === false ? 'Inactive' : 'Active';
+                        return (
+                          <tr key={customer.id} className="border-t border-white/30">
+                            <td className="py-3 px-4 font-medium text-slate-900">{fullName}</td>
+                            <td className="py-3 px-4 text-slate-600">{customer.email || '-'}</td>
+                            <td className="py-3 px-4">{customer.phone || '-'}</td>
+                            <td className="py-3 px-4">
+                              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusLabel === 'Active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>
+                                {statusLabel}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4">{joined}</td>
                           </tr>
                         );
                       })

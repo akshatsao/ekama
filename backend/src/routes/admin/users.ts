@@ -11,11 +11,30 @@ type UserDoc = {
   password: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   role: 'admin' | 'customer';
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
+
+router.get('/customers', async (_req, res) => {
+  try {
+    const users = getUsersCollection();
+    const rows = await users
+      .find({ role: 'customer' }, { projection: { _id: 0, password: 0 } })
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .toArray();
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Error fetching customers:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch customers'
+    } as ApiResponse<null>);
+  }
+});
 
 router.post('/make-admin', (req, res) => {
   const users = getUsersCollection();
