@@ -2,7 +2,7 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import express from "express";
 import Razorpay from "razorpay";
-import { getOrdersCollection } from "../../utils/database";
+import { getOrdersCollection, getProductsCollection } from "../../utils/database";
 import globalEventEmitter, { events } from "../../utils/events";
 import { buildShiprocketOrderPayload, createShiprocketOrder } from "../../utils/shiprocket";
 
@@ -146,6 +146,33 @@ router.post("/create-order-with-items", async (req, res) => {
       createdAt: now,
       updatedAt: now
     };
+
+    // Map missing adminProductIds for stale carts before saving
+    if (orderDoc.items && orderDoc.items.length > 0) {
+      const productIdsToFetch = new Set<string>();
+      orderDoc.items.forEach((item: any) => {
+        if (item && item.id && !item.adminProductId) {
+          productIdsToFetch.add(item.id);
+        }
+      });
+      if (productIdsToFetch.size > 0) {
+        const productsCollection = getProductsCollection();
+        const productDocs = await productsCollection
+          .find({ id: { $in: Array.from(productIdsToFetch) } })
+          .project({ id: 1, adminProductId: 1, _id: 0 })
+          .toArray();
+        const productMap: Record<string, string> = {};
+        for (const p of productDocs) {
+          if (p.adminProductId) productMap[p.id] = p.adminProductId;
+        }
+        orderDoc.items = orderDoc.items.map((item: any) => {
+          if (item && item.id && !item.adminProductId && productMap[item.id]) {
+            return { ...item, adminProductId: productMap[item.id] };
+          }
+          return item;
+        });
+      }
+    }
 
     await orders.insertOne(orderDoc);
 
