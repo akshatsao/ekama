@@ -30,7 +30,7 @@ router.get('/', authorizeAdmin, async (req, res) => {
             }
             if (Array.isArray(row.items)) {
                 row.items.forEach((item: any) => {
-                    if (item && item.id && !item.adminProductId) {
+                    if (item && item.id) {
                         productIds.add(item.id);
                     }
                 });
@@ -74,10 +74,10 @@ router.get('/', authorizeAdmin, async (req, res) => {
         const orders = rows.map((row) => {
             const { _id, ...rest } = row;
             
-            // Map missing adminProductIds
+            // Map latest adminProductIds from database
             if (Array.isArray(rest.items)) {
                 rest.items = rest.items.map((item: any) => {
-                    if (item && item.id && !item.adminProductId && productMap[item.id]) {
+                    if (item && item.id && productMap[item.id]) {
                         return { ...item, adminProductId: productMap[item.id] };
                     }
                     return item;
