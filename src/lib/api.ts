@@ -1,4 +1,5 @@
-const IS_PROD = import.meta.env.PROD || window.location.hostname !== 'localhost';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('10.');
+const IS_PROD = import.meta.env.PROD && !isLocal;
 const PROD_API_URL = 'https://ekama.onrender.com';
 const DEV_API_URL = 'http://localhost:3001';
 
