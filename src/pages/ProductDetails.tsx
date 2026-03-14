@@ -22,6 +22,7 @@ type Product = {
   specifications?: Record<string, string>;
   tags?: string[];
   collection?: string;
+  adminProductId?: string;
   siddhAvailable?: boolean;
 };
 
@@ -105,6 +106,7 @@ const ProductDetails = () => {
       name: `${product.name}${isEnergized ? " (Energized)" : ""}`,
       price: finalPrice,
       image: images[0],
+      adminProductId: product.adminProductId,
     });
     toast({
       title: "Added to Cart",

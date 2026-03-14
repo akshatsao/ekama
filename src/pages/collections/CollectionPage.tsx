@@ -12,6 +12,7 @@ interface Product {
   price: number;
   originalPrice?: number;
   images: string[];
+  adminProductId?: string;
 }
 
 const normalizeImage = (image?: string) => {
@@ -201,7 +202,7 @@ const CollectionPage = () => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              addItem({ id: p.id, name: p.name, price: p.price, image: p.images[0] });
+                              addItem({ id: p.id, name: p.name, price: p.price, image: p.images[0], adminProductId: p.adminProductId });
                             }}
                             className="px-3 md:px-5 py-1 bg-white border border-orange-600 text-orange-600 font-bold text-[10px] md:text-xs rounded-lg hover:bg-orange-50 transition-all duration-300"
                           >
@@ -226,7 +227,7 @@ const CollectionPage = () => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              addItem({ id: p.id, name: p.name, price: p.price, image: p.images[0] });
+                              addItem({ id: p.id, name: p.name, price: p.price, image: p.images[0], adminProductId: p.adminProductId });
                             }}
                             className="px-2 py-0.5 md:px-3 md:py-1 hover:bg-orange-50 font-bold text-[10px] md:text-xs"
                           >

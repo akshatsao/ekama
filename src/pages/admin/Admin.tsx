@@ -1747,7 +1747,11 @@ const Admin = () => {
                               <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                                 <span>Qty {quantity}</span>
                                 <span>₹ {price.toFixed(2)}</span>
-                                {item.adminProductId && <span>Admin ID {item.adminProductId}</span>}
+                                {item.adminProductId && (
+                                  <span className="ml-2 font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                                    ID: {item.adminProductId}
+                                  </span>
+                                )}
                               </div>
                             </div>
                           );
