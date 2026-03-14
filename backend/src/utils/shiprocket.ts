@@ -49,8 +49,6 @@ export type ShiprocketOrderResponse = {
   status?: string;
 };
 
-type ProxyOrderResponse = ShiprocketOrderResponse & { success?: boolean };
-
 let tokenCache: ShiprocketTokenCache = {
   token: '',
   expiresAt: 0
@@ -153,29 +151,6 @@ export const buildShiprocketOrderPayload = (input: {
 };
 
 export const createShiprocketOrder = async (payload: ShiprocketOrderPayload) => {
-  const proxyUrlRaw = process.env.SHIPROCKET_PROXY_URL;
-  if (proxyUrlRaw) {
-    const proxyUrl = proxyUrlRaw.replace(/\/$/, '');
-    const proxyKey = process.env.SHIPROCKET_PROXY_KEY || '';
-    const res = await fetch(`${proxyUrl}/api/shiprocket/orders/create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(proxyKey ? { Authorization: `Bearer ${proxyKey}` } : {})
-      },
-      body: JSON.stringify(payload)
-    });
-    const data = (await res.json().catch(() => ({}))) as ProxyOrderResponse;
-    if (!res.ok) {
-      throw new Error(`Shiprocket proxy failed: ${res.status}`);
-    }
-    return data;
-  }
-
-  return createShiprocketOrderDirect(payload);
-};
-
-export const createShiprocketOrderDirect = async (payload: ShiprocketOrderPayload) => {
   const token = await getShiprocketToken();
   const res = await fetch(`${SHIPROCKET_BASE_URL}/orders/create/adhoc`, {
     method: 'POST',
