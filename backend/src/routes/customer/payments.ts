@@ -4,6 +4,7 @@ import express from "express";
 import Razorpay from "razorpay";
 import { getOrdersCollection } from "../../utils/database";
 import globalEventEmitter, { events } from "../../utils/events";
+import { buildShiprocketOrderPayload, createShiprocketOrder } from "../../utils/shiprocket";
 
 dotenv.config();
 
@@ -19,11 +20,44 @@ type OrderDoc = {
   totalAmount: number;
   status: string;
   shippingAddress?: string | null;
+  shippingDetails?: {
+    name?: string;
+    phone?: string;
+    addressLine?: string;
+    locality?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+  } | null;
   paymentMethod?: string | null;
   paymentStatus?: string | null;
+  shiprocket?: {
+    orderId?: number;
+    shipmentId?: number;
+    status?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 };
+
+type OrderItemInput = {
+  id?: string;
+  adminProductId?: string;
+  name?: string;
+  quantity?: number;
+  price?: number;
+};
+
+const normalizeOrderItems = (items: unknown[]) =>
+  items
+    .map((item) => (item && typeof item === 'object' ? (item as OrderItemInput) : null))
+    .filter(Boolean)
+    .map((item) => ({
+      name: String(item?.name || 'Item'),
+      sku: String(item?.adminProductId || item?.id || 'SKU'),
+      quantity: Number(item?.quantity || 1),
+      price: Number(item?.price || 0)
+    }));
 
 const getRazorpayClient = () => {
   const keyId = process.env.RAZORPAY_KEY_ID;
@@ -70,6 +104,9 @@ router.post("/verify", (req, res) => {
   if (!keySecret) {
     return res.status(500).json({ error: "Razorpay keys are not configured" });
   }
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    return res.status(400).json({ error: "Missing required payment fields" });
+  }
 
   const generatedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET as string)
@@ -84,7 +121,7 @@ router.post("/verify", (req, res) => {
 
 router.post("/create-order-with-items", async (req, res) => {
   try {
-    const { items, totalAmount, userId, customerEmail, customerName, shippingAddress, paymentMethod, name } = req.body;
+    const { items, totalAmount, userId, customerEmail, customerName, shippingAddress, paymentMethod, name, shippingDetails } = req.body;
 
     if (!items || !totalAmount || !userId) {
       return res.status(400).json({ error: "Items, totalAmount, and userId are required" });
@@ -103,6 +140,7 @@ router.post("/create-order-with-items", async (req, res) => {
       totalAmount,
       status: 'pending',
       shippingAddress: shippingAddress || null,
+      shippingDetails: shippingDetails || null,
       paymentMethod: paymentMethod || 'razorpay',
       paymentStatus: 'pending',
       createdAt: now,
@@ -146,6 +184,60 @@ router.post("/update-order-status", async (req, res) => {
 
     if (result.matchedCount === 0) {
       return res.status(404).json({ error: "Order not found" });
+    }
+
+    const updated = await orders.findOne(filter);
+    const orderRow = updated as OrderDoc | null;
+    if (orderRow && !orderRow.shiprocket?.orderId) {
+      const details = orderRow.shippingDetails || null;
+      const shouldBook =
+        (status && status !== 'pending') &&
+        details?.addressLine &&
+        details?.city &&
+        details?.state &&
+        details?.pincode &&
+        details?.phone &&
+        (orderRow.customerEmail || orderRow.customerName || orderRow.name);
+
+      if (shouldBook) {
+        try {
+          const customerNameValue = orderRow.customerName || orderRow.name || 'Customer';
+          const customerEmailValue = orderRow.customerEmail || 'no-reply@example.com';
+          const orderItems = Array.isArray(orderRow.items) ? orderRow.items : [];
+          const payload = buildShiprocketOrderPayload({
+            orderId: orderRow.id,
+            createdAt: orderRow.createdAt,
+            customerName: customerNameValue,
+            customerEmail: customerEmailValue,
+            shippingPhone: details.phone || '',
+            addressLine: details.addressLine || '',
+            locality: details.locality || '',
+            city: details.city || '',
+            state: details.state || '',
+            pincode: details.pincode || '',
+            items: normalizeOrderItems(orderItems),
+            paymentMethod: orderRow.paymentMethod || 'razorpay',
+            totalAmount: Number(orderRow.totalAmount || 0)
+          });
+
+          const shiprocketResponse = await createShiprocketOrder(payload);
+          await orders.updateOne(
+            { id: orderRow.id },
+            {
+              $set: {
+                shiprocket: {
+                  orderId: shiprocketResponse.order_id,
+                  shipmentId: shiprocketResponse.shipment_id,
+                  status: shiprocketResponse.status
+                },
+                updatedAt: new Date()
+              }
+            }
+          );
+        } catch (shipErr) {
+          console.error('Shiprocket booking failed:', shipErr);
+        }
+      }
     }
 
     return res.json({ success: true, orderId: razorpayOrderId || orderId });

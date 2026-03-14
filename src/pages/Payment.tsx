@@ -148,6 +148,17 @@ const Payment = () => {
       }
 
       const shippingAddress = selectedAddress ? formatAddress(selectedAddress) : '';
+      const shippingDetails = selectedAddress
+        ? {
+          name: selectedAddress.name,
+          phone: selectedAddress.phone,
+          addressLine: selectedAddress.addressLine,
+          locality: selectedAddress.locality,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode
+        }
+        : null;
 
       // 1. Create order with items in database
       const orderResponse = await apiFetch("/api/payments/create-order-with-items", {
@@ -166,7 +177,8 @@ const Payment = () => {
           customerEmail: user.email,
           customerName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
           paymentMethod: paymentMethod,
-          shippingAddress
+          shippingAddress,
+          shippingDetails
         }),
       }) as { orderId: string; status: string };
 
@@ -211,8 +223,19 @@ const Payment = () => {
         description: "Order Payment",
         order_id: orderId,
         handler: async function (response: RazorpayHandlerResponse) {
-          // success - update order status
           try {
+            const verifyRes = await apiFetch("/api/payments/verify", {
+              method: "POST",
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            if (!verifyRes || verifyRes.status !== "ok") {
+              throw new Error("Signature verification failed");
+            }
+
             await apiFetch("/api/payments/update-order-status", {
               method: "POST",
               body: JSON.stringify({
@@ -228,10 +251,8 @@ const Payment = () => {
             clearCart();
             navigate("/payment-success", { state: { orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id } });
           } catch (error) {
-            console.error('Error updating order status:', error);
-            toast({ title: "Payment successful", description: "Order status update failed, please contact support" });
-            clearCart();
-            navigate("/payment-success", { state: { orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id } });
+            console.error('Payment verification failed:', error);
+            toast({ title: "Payment failed", description: "Verification failed. Please contact support." });
           }
         },
         modal: {
