@@ -18,6 +18,7 @@ import paymentRoutes from './routes/payments';
 import productRoutes from './routes/products';
 import settingsRoutes from './routes/settings';
 import userRoutes from './routes/users';
+import adminUsersRoute from './routes/admin/users';
 import adminCouponsRoute from './routes/admin/coupons';
 import customerCouponsRoute from './routes/customer/coupons';
 import { initDatabase } from './utils/database';
@@ -117,6 +118,7 @@ uniquePaths.forEach(uploadPath => {
 app.use('/api/products', productRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin/users', adminUsersRoute);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/settings', settingsRoutes);
 

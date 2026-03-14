@@ -53,6 +53,7 @@ const proxyOptions = {
 app.use('/api/products', createProxyMiddleware(proxyOptions));
 app.use('/api/collections', createProxyMiddleware(proxyOptions));
 app.use('/api/users', createProxyMiddleware(proxyOptions));
+app.use('/api/admin', createProxyMiddleware(proxyOptions));
 app.use('/api/settings', createProxyMiddleware(proxyOptions));
 app.use('/api/payments', createProxyMiddleware({ ...proxyOptions, timeout: 0 }));
 app.use('/uploads', createProxyMiddleware(proxyOptions));

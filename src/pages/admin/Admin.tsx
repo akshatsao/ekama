@@ -345,7 +345,7 @@ const Admin = () => {
     const fetchCustomers = async () => {
       setCustomersLoading(true);
       try {
-        const res = await apiFetch('/api/users/customers');
+        const res = await apiFetch('/api/admin/users/customers');
         const rows = Array.isArray(res?.data) ? res.data : [];
         if (isMounted) {
           setCustomers(rows as CustomerRow[]);
