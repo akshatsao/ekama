@@ -224,7 +224,6 @@ For issues and questions:
 1. Check the troubleshooting section in the documentation
 2. Review the GitHub issues
 3. Contact the development team
-
 ---
 
 **Last Updated**: December 2025  
